@@ -58,9 +58,16 @@ Also update the port in `manage.sh` (lines 29, 74, 106, 119) if using the manage
 
 #### Option 1: Using Management Script (Recommended)
 
+**Silent mode** (no logging):
 ```bash
 cd <PROJECT_ROOT>
 ./manage.sh start
+```
+
+**Verbose mode** (with logging):
+```bash
+cd <PROJECT_ROOT>
+./manage.sh start:verbose
 ```
 
 #### Option 2: Foreground (Recommended for Testing)
@@ -151,7 +158,11 @@ curl http://localhost:21435/v1/models
 ### View Logs
 
 ```bash
-# Follow logs in real-time
+# Using management script (recommended)
+cd <PROJECT_ROOT>
+./manage.sh logs
+
+# Or manually follow logs in real-time
 tail -f /tmp/zai-proxy.log
 
 # View last 50 lines
@@ -160,6 +171,8 @@ tail -n 50 /tmp/zai-proxy.log
 # Search for errors
 grep ERROR /tmp/zai-proxy.log
 ```
+
+**Note**: Logs are only written when using `./manage.sh start:verbose`. The silent mode (`./manage.sh start`) does not write logs.
 
 ### Restart the Proxy
 
@@ -430,13 +443,14 @@ This proxy is provided as-is for enabling Z.AI integration with JetBrains IDEs.
 
 ## Version History
 
+- **v1.3** - Added silent and verbose start modes to management script
 - **v1.2** - Updated documentation with project root placeholder and port configuration notes
 - **v1.1** - Fixed URL construction bugs, added CORS support, improved logging
 - **v1.0** - Initial release with basic `/v1/` to `/v4/` path rewriting
 
 ---
 
-**Last Updated**: 2026-01-03
+**Last Updated**: 2026-01-05
 **Compatible with**: IntelliJ IDEA 2025.3+
 **Tested with**: Z.AI GLM-4.7
 **Default Port**: 21435 (configurable, must be 0-65535)

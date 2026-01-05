@@ -19,6 +19,33 @@ case "$1" in
     fi
 
     echo "Starting Z.AI Proxy..."
+    python3 "$PROXY_SCRIPT" >/dev/null 2>&1 &
+    echo $! > "$PID_FILE"
+    sleep 2
+
+    if ps -p $(cat "$PID_FILE") > /dev/null 2>&1; then
+      echo "✓ Z.AI Proxy started successfully"
+      echo "  PID: $(cat $PID_FILE)"
+      echo "  URL: http://localhost:21435"
+    else
+      echo "✗ Failed to start Z.AI Proxy"
+      rm "$PID_FILE"
+      exit 1
+    fi
+    ;;
+
+  start:verbose)
+    if [ -f "$PID_FILE" ]; then
+      PID=$(cat "$PID_FILE")
+      if ps -p "$PID" > /dev/null 2>&1; then
+        echo "Z.AI Proxy is already running (PID: $PID)"
+        exit 1
+      else
+        rm "$PID_FILE"
+      fi
+    fi
+
+    echo "Starting Z.AI Proxy..."
     python3 "$PROXY_SCRIPT" > "$LOG_FILE" 2>&1 &
     echo $! > "$PID_FILE"
     sleep 2
@@ -136,21 +163,23 @@ case "$1" in
   *)
     echo "Z.AI Proxy Management Script"
     echo ""
-    echo "Usage: $0 {start|stop|restart|status|logs|test}"
+    echo "Usage: $0 {start|start:verbose|stop|restart|status|logs|test}"
     echo ""
     echo "Commands:"
-    echo "  start   - Start the proxy server"
-    echo "  stop    - Stop the proxy server"
-    echo "  restart - Restart the proxy server"
-    echo "  status  - Show proxy status and recent logs"
-    echo "  logs    - Follow proxy logs in real-time"
-    echo "  test    - Test proxy endpoints"
+    echo "  start         - Start the proxy server (silent mode)"
+    echo "  start:verbose - Start the proxy server (with logging)"
+    echo "  stop          - Stop the proxy server"
+    echo "  restart       - Restart the proxy server"
+    echo "  status        - Show proxy status and recent logs"
+    echo "  logs          - Follow proxy logs in real-time"
+    echo "  test          - Test proxy endpoints"
     echo ""
     echo "Examples:"
-    echo "  $0 start     # Start the proxy"
-    echo "  $0 status    # Check if running"
-    echo "  $0 logs      # View logs"
-    echo "  $0 test      # Test endpoints"
+    echo "  $0 start            # Start the proxy (silent)"
+    echo "  $0 start:verbose    # Start the proxy (with logging)"
+    echo "  $0 status           # Check if running"
+    echo "  $0 logs             # View logs"
+    echo "  $0 test             # Test endpoints"
     exit 1
     ;;
 esac
